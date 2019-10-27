@@ -40,8 +40,8 @@ def get_url_embassy(country):
     return "https://embassy.goabroad.com/embassies-of/" + country
 
 # item is the column, state is abbreviation
-@app.route('/check_url/<item>/<state>')
-def check_url_from_spreadsheet(item, state):
-    url = get_url_from_spreadsheet(item, state)
-    if not check_url(url):
+# @app.route('/check_url/<item>/<state>')
+# def check_url_from_spreadsheet(item, state):
+#     url = get_url_from_spreadsheet(item, state)
+#     if not check_url(url):
 
