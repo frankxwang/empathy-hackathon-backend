@@ -6,6 +6,8 @@ import hashlib
 
 app = Flask(__name__)
 
+application = app
+
 spreadsheet_link = "https://docs.google.com/spreadsheets/d/e/2PACX-1vREryrwAkgkB-fsWClSUogKrhAMxeo9D1Tgs3lHWUIw5K-OTDd66XdsmRVfZ2qnzwIzZr8RBbKWBxLo/pub?gid=0&single=true&output=csv"
 
 
@@ -45,3 +47,5 @@ def get_url_embassy(country):
 #     url = get_url_from_spreadsheet(item, state)
 #     if not check_url(url):
 
+if __name__ == "__main__":
+    app.run("0.0.0.0")
