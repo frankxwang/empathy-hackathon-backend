@@ -37,8 +37,6 @@ def get_url_from_spreadsheet(item, state):
     state_index = side_headers.index(state)
     item_index = headers.index(item)
 
-    check_url_from_spreadsheet(item, state)
-
     return rows[state_index][item_index]
 
 
@@ -47,6 +45,7 @@ def get_url_embassy(country):
     return "https://embassy.goabroad.com/embassies-of/" + country
 
 
+# currently not used
 def check_url_from_spreadsheet(item, state):
     url = get_url_from_spreadsheet(item, state)
     if not check_url(url):
