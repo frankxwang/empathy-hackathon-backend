@@ -46,7 +46,7 @@ def get_url_embassy(country):
 # currently not used
 def check_url_from_spreadsheet(item, state):
     url = get_url_from_spreadsheet(item, state)
-    if not check_url(url):
+    if not check_url(url) and url != "":
         with SMTP("firststep.id") as smtp:
             with open("config.json", "r") as f:
                 info = json.load(f)
