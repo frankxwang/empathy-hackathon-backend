@@ -77,8 +77,8 @@ def check_all_urls_from_spreadsheet():
     side_headers = [row[0] for row in rows]
 
     with SMTP("0.0.0.0") as smtp:
-        for state_index, state in list(enumerate(headers))[1:]:
-            for item_index, item in list(enumerate(side_headers))[1:]:
+        for state_index, state in list(enumerate(side_headers))[1:]:
+            for item_index, item in list(enumerate(headers))[1:]:
 
                 url = rows[state_index][item_index]
 
