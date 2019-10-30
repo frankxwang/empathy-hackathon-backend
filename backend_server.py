@@ -27,7 +27,7 @@ def get_url_from_spreadsheet(item, state):
     text = StringIO(r.text)
     reader = csv.reader(text)
 
-    rows = [row for row in reader][1:]
+    rows = [row[1:] for row in reader][1:]
 
     headers = rows[0]
     side_headers = [row[1] for row in rows]
@@ -71,7 +71,7 @@ def check_all_urls_from_spreadsheet():
     text = StringIO(r.text)
     reader = csv.reader(text)
 
-    rows = [row for row in reader][1:]
+    rows = [row[1:] for row in reader][1:]
 
     headers = rows[0]
     side_headers = [row[1] for row in rows]
