@@ -3,6 +3,10 @@ import csv
 import requests
 from io import StringIO
 import hashlib
+from smtplib import SMTP
+import json
+import atexit
+from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
 
@@ -28,11 +32,12 @@ def get_url_from_spreadsheet(item, state):
     rows = [row for row in reader][1:]
 
     headers = rows[0]
-    print(headers)
     side_headers = [row[1] for row in rows]
 
     state_index = side_headers.index(state)
     item_index = headers.index(item)
+
+    check_url_from_spreadsheet(item, state)
 
     return rows[state_index][item_index]
 
@@ -41,11 +46,65 @@ def get_url_from_spreadsheet(item, state):
 def get_url_embassy(country):
     return "https://embassy.goabroad.com/embassies-of/" + country
 
-# item is the column, state is abbreviation
-# @app.route('/check_url/<item>/<state>')
-# def check_url_from_spreadsheet(item, state):
-#     url = get_url_from_spreadsheet(item, state)
-#     if not check_url(url):
+
+def check_url_from_spreadsheet(item, state):
+    url = get_url_from_spreadsheet(item, state)
+    if not check_url(url):
+        with SMTP("firststep.id") as smtp:
+            with open("config.json", "r") as f:
+                info = json.load(f)
+                email = info["email"]
+                password = info["password"]
+                recipients = info["recipients"]
+
+            smtp.login(email, password)
+
+            msg = "From: " + email + "\nSubject: The link " + url + " needs to be updated\nThe link " + url + " is no longer a valid link and needs to be updated. The column is " + item + " and the state is " + state + "."
+
+            smtp.sendmail(email, recipients, msg)
+
+            return False
+
+    return True
+
+
+def check_all_urls_from_spreadsheet():
+
+    r = requests.get(spreadsheet_link)
+    text = StringIO(r.text)
+    reader = csv.reader(text)
+
+    rows = [row for row in reader][1:]
+
+    headers = rows[0]
+    side_headers = [row[1] for row in rows]
+
+    with SMTP("firststep.id") as smtp:
+        for state_index, state in enumerate(headers):
+            for item_index, item in enumerate(side_headers):
+
+                url = rows[state_index][item_index]
+
+                if not check_url(url):
+                    with open("config.json", "r") as f:
+                        info = json.load(f)
+                        email = info["email"]
+                        password = info["password"]
+                        recipients = info["recipients"]
+
+                    smtp.login(email, password)
+
+                    msg = "From: " + email + "\nSubject: The link " + url + " needs to be updated\nThe link " + url + " is no longer a valid link and needs to be updated. The column is " + item + " and the state is " + state + "."
+
+                    smtp.sendmail(email, recipients, msg)
+
 
 if __name__ == "__main__":
     app.run("0.0.0.0")
+
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(func=check_all_urls_from_spreadsheet, trigger="interval", hours=6)
+    scheduler.start()
+
+    # Shut down the scheduler when exiting the app
+    atexit.register(lambda: scheduler.shutdown())
