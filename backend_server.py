@@ -5,8 +5,6 @@ from io import StringIO
 import hashlib
 from smtplib import SMTP
 import json
-import atexit
-from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
 
@@ -100,10 +98,3 @@ def check_all_urls_from_spreadsheet():
 
 if __name__ == "__main__":
     app.run("0.0.0.0")
-
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(func=check_all_urls_from_spreadsheet, trigger="interval", hours=6)
-    scheduler.start()
-
-    # Shut down the scheduler when exiting the app
-    atexit.register(lambda: scheduler.shutdown())

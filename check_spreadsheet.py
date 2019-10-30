@@ -1,0 +1,3 @@
+from backend_server import check_all_urls_from_spreadsheet
+
+check_all_urls_from_spreadsheet()
