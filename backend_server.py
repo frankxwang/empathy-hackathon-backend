@@ -30,7 +30,7 @@ def get_url_from_spreadsheet(item, state):
     rows = [row[1:] for row in reader][1:]
 
     headers = rows[0]
-    side_headers = [row[1] for row in rows]
+    side_headers = [row[0] for row in rows]
 
     state_index = side_headers.index(state)
     item_index = headers.index(item)
@@ -74,7 +74,7 @@ def check_all_urls_from_spreadsheet():
     rows = [row[1:] for row in reader][1:]
 
     headers = rows[0]
-    side_headers = [row[1] for row in rows]
+    side_headers = [row[0] for row in rows]
 
     with SMTP("firststep.id") as smtp:
         for state_index, state in list(enumerate(headers))[1:]:
