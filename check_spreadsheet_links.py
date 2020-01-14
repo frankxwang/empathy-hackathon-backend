@@ -4,13 +4,17 @@ from io import StringIO
 from smtplib import SMTP
 import json
 import hashlib
-from datetime import date
+from goose3 import Goose, Configuration
+
+config = Configuration()
+config.http_timeout = 10
+g = Goose(config)
 
 
 def hash_website(url):
     # verify is False since some of the government websites don't work for some reason if verify is True
     # fix maybe in the future?
-    return hashlib.sha512(requests.get(url, verify=False, timeout=10).content).hexdigest()
+    return hashlib.sha512(g.extract(url).cleaned_text.encode("utf-8")).hexdigest()
 
 
 def check_url_hash(url):

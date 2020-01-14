@@ -3,12 +3,17 @@ import hashlib
 import requests
 import csv
 from io import StringIO
+from goose3 import Goose, Configuration
+
+config = Configuration()
+config.http_timeout = 10
+g = Goose(config)
 
 
 def hash_website(url):
     # verify is False since some of the government websites don't work for some reason if verify is True
     # fix maybe in the future?
-    return hashlib.sha512(requests.get(url, verify=False, timeout=10).content).hexdigest()
+    return hashlib.sha512(g.extract(url).cleaned_text.encode("utf-8")).hexdigest()
 
 
 with open("config.json", "r") as f:
