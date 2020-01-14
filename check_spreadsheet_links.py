@@ -42,12 +42,16 @@ urls_timeout = []
 
 for state_index, state in list(enumerate(side_headers))[1:]:
 
+    print(state)
+
     for item_index, item in list(enumerate(headers))[1:]:
 
         url = rows[state_index][item_index]
 
         if url == "":
             continue
+
+        print(url)
 
         try:
             has_changed, hash_content = check_url_hash(url)
