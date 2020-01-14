@@ -4,6 +4,7 @@ from io import StringIO
 from smtplib import SMTP
 import json
 import hashlib
+from datetime import date
 from goose3 import Goose, Configuration
 
 config = Configuration()
