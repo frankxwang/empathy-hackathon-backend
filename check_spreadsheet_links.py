@@ -14,7 +14,7 @@ def hash_website(url):
 
 def check_url_hash(url):
     hash_content = hash_website(url)
-    return hash_content == website_hashes[url], hash_content
+    return (hash_content == website_hashes[url]), hash_content
 
 
 with open("config.json", "r") as f:
