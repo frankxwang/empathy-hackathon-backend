@@ -9,7 +9,7 @@ import hashlib
 def hash_website(url):
     # verify is False since some of the government websites don't work for some reason if verify is True
     # fix maybe in the future?
-    return hashlib.sha512(requests.get(url, verify=False).content).hexdigest()
+    return hashlib.sha512(requests.get(url, verify=False, timeout=10).content).hexdigest()
 
 
 def check_url_hash(url):
@@ -37,28 +37,48 @@ rows = [row[1:] for row in reader][1:]
 headers = rows[0]
 side_headers = [row[0] for row in rows]
 
+urls_changed = []
+urls_timeout = []
+
+for state_index, state in list(enumerate(side_headers))[1:]:
+
+    for item_index, item in list(enumerate(headers))[1:]:
+
+        url = rows[state_index][item_index]
+
+        if url == "":
+            continue
+
+        try:
+            has_changed, hash_content = check_url_hash(url)
+        except requests.Timeout:
+            urls_timeout.append((url, state, item))
+            continue
+
+        if has_changed:
+            urls_changed.append((url, state, item))
+            website_hashes[url] = hash_content
+
 with SMTP() as smtp:
 
-    for state_index, state in list(enumerate(side_headers))[1:]:
+    msg = "From: " + email + "\nSubject: firststep.id Daily Links Update\n"
+    msg += "Websites whose content has been changed:\n"
+    for info in urls_changed:
+        url, state, item = info
+        msg += "\n"
+        msg += "State: " + state + ", Item: " + item + "\n"
+        msg += "Link: " + url + "\n"
 
-        for item_index, item in list(enumerate(headers))[1:]:
+    msg += "\nWebsites that the Python scripts could not access (need to be manually checked):\n"
+    for info in urls_timeout:
+        url, state, item = info
+        msg += "\n"
+        msg += "State: " + state + ", Item: " + item + "\n"
+        msg += "Link: " + url + "\n"
 
-            url = rows[state_index][item_index]
-
-            if url == "":
-                continue
-
-            has_changed, hash_content = check_url_hash(url)
-
-            if has_changed:
-
-                msg = "From: " + email + "\nSubject: The link " + url + " may need to be updated\nThe content on " + url + " has changed and the link may need to be updated. The column is " + item + " and the state is " + state + "."
-
-                smtp.connect()
-                smtp.login(email, password)
-                smtp.sendmail(email, recipients, msg)
-
-                website_hashes[url] = hash_content
+    smtp.connect()
+    smtp.login(email, password)
+    smtp.sendmail(email, recipients, msg)
 
 with open(website_hashes_file, "w") as f:
     json.dump(website_hashes, f)

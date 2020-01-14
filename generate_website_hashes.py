@@ -8,7 +8,7 @@ from io import StringIO
 def hash_website(url):
     # verify is False since some of the government websites don't work for some reason if verify is True
     # fix maybe in the future?
-    return hashlib.sha512(requests.get(url, verify=False).content).hexdigest()
+    return hashlib.sha512(requests.get(url, verify=False, timeout=10).content).hexdigest()
 
 
 with open("config.json", "r") as f:
@@ -40,7 +40,11 @@ for state_index, state in list(enumerate(side_headers))[1:]:
 
         print(url)
 
-        website_hashes[url] = hash_website(url)
+        try:
+            website_hashes[url] = hash_website(url)
+        except requests.Timeout:
+            website_hashes[url] = "Timed Out"
+            continue
 
 with open(website_hashes_file, "w") as f:
     json.dump(website_hashes, f)
