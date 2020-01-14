@@ -4,6 +4,7 @@ from io import StringIO
 from smtplib import SMTP
 import json
 import hashlib
+from datetime import date
 
 
 def hash_website(url):
@@ -65,7 +66,7 @@ for state_index, state in list(enumerate(side_headers))[1:]:
 
 with SMTP() as smtp:
 
-    msg = "From: " + email + "\nSubject: firststep.id Daily Links Update\n"
+    msg = "From: " + email + "\nSubject: firststep.id Daily Links Update: " + str(date.today()) + "\n"
     msg += "Websites whose content has been changed:\n"
     for info in urls_changed:
         url, state, item = info
