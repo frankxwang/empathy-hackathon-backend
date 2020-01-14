@@ -9,12 +9,12 @@ import hashlib
 def hash_website(url):
     # verify is False since some of the government websites don't work for some reason if verify is True
     # fix maybe in the future?
-    return hashlib.sha512(requests.get(url, timeout=10).content).hexdigest()
+    return hashlib.sha512(requests.get(url, verify=False, timeout=10).content).hexdigest()
 
 
 def check_url_hash(url):
     hash_content = hash_website(url)
-    return (hash_content == website_hashes[url]), hash_content
+    return (hash_content != website_hashes[url]), hash_content
 
 
 with open("config.json", "r") as f:
@@ -25,8 +25,8 @@ with open("config.json", "r") as f:
     spreadsheet_link = info["spreadsheet_link"]
     website_hashes_file = info["website_hashes_file"]
 
-    with open(website_hashes_file) as f:
-        website_hashes = json.load(f)
+with open(website_hashes_file) as f:
+    website_hashes = json.load(f)
 
 r = requests.get(spreadsheet_link)
 text = StringIO(r.text)
