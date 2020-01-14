@@ -42,7 +42,7 @@ for state_index, state in list(enumerate(side_headers))[1:]:
 
         try:
             website_hashes[url] = hash_website(url)
-        except requests.Timeout:
+        except requests.exceptions.RequestException:
             website_hashes[url] = "Timed Out"
             continue
 

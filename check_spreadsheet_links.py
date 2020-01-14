@@ -51,7 +51,7 @@ for state_index, state in list(enumerate(side_headers))[1:]:
 
         try:
             has_changed, hash_content = check_url_hash(url)
-        except requests.Timeout:
+        except requests.exceptions.RequestException:
             urls_timeout.append((url, state, item))
             continue
 
